@@ -1,99 +1,70 @@
 package org.br.lucaspjardim.dao.venda;
 
+import org.br.lucaspjardim.dao.generic.GenericDAO;
 import org.br.lucaspjardim.model.venda.Venda;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
-public class VendaDAO implements IVendaDAO {
+/**
+ * Author: Lucas Jardim
+ */
+public class VendaDAO extends GenericDAO<Venda> {
 
     @Override
-    public void cadastrarVenda(Connection connection, Venda venda) throws SQLException {
-        String sql = "INSERT INTO venda (cliente_id, produto_id, quantidade, valor_total) VALUES (?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, venda.getIdCliente());
-            stmt.setLong(2, venda.getIdProduto());
-            stmt.setInt(3, venda.getQuantidade());
-            stmt.setDouble(4, venda.getValorTotal());
-
-            stmt.executeUpdate();
-        }
+    protected String getInsertQuery() {
+        return "INSERT INTO venda (cliente_id, produto_id, quantidade, valor_total) VALUES (?, ?, ?, ?)";
     }
 
     @Override
-    public void atualizarVenda(Connection connection, Venda venda) throws SQLException {
-        String sql = "UPDATE venda SET cliente_id = ?, produto_id = ?, quantidade = ?, valor_total = ? WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, venda.getIdCliente());
-            stmt.setLong(2, venda.getIdProduto());
-            stmt.setInt(3, venda.getQuantidade());
-            stmt.setDouble(4, venda.getValorTotal());
-            stmt.setLong(5, venda.getId());
-
-            stmt.executeUpdate();
-        }
+    protected String getUpdateQuery() {
+        return "UPDATE venda SET cliente_id = ?, produto_id = ?, quantidade = ?, valor_total = ? WHERE id = ?";
     }
 
     @Override
-    public Venda buscarVenda(Connection connection, Long id) throws SQLException {
-        String sql = "SELECT * FROM venda WHERE id = ?";
-        Venda venda = null;
+    protected String getDeleteQuery() {
+        return "DELETE FROM venda WHERE id = ?";
+    }
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
+    @Override
+    protected String getSelectQuery() {
+        return "SELECT * FROM venda WHERE id = ?";
+    }
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    venda = new Venda(
-                            rs.getLong("cliente_id"),
-                            rs.getLong("produto_id"),
-                            rs.getInt("quantidade"),
-                            rs.getDouble("valor_total"),
-                            rs.getDate("data_venda")
-                    );
-                    venda.setId(rs.getLong("id"));
-                }
-            }
-        }
+    @Override
+    protected String getSelectAllQuery() {
+        return "SELECT * FROM venda";
+    }
+
+    @Override
+    protected Venda mapRow(ResultSet resultSet) throws SQLException {
+        Venda venda = new Venda(
+                resultSet.getLong("cliente_id"),
+                resultSet.getLong("produto_id"),
+                resultSet.getInt("quantidade"),
+                resultSet.getDouble("valor_total"),
+                resultSet.getDate("data_venda")
+        );
+        venda.setId(resultSet.getLong("id"));
         return venda;
     }
 
     @Override
-    public List<Venda> buscarTodasVendas(Connection connection) throws SQLException {
-        String sql = "SELECT * FROM venda";
-        List<Venda> vendas = new ArrayList<>();
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Venda venda = new Venda(
-                        rs.getLong("cliente_id"),
-                        rs.getLong("produto_id"),
-                        rs.getInt("quantidade"),
-                        rs.getDouble("valor_total"),
-                        rs.getDate("data_venda")
-                );
-                venda.setId(rs.getLong("id"));
-                vendas.add(venda);
-            }
-        }
-        return vendas;
+    protected void setInsertParameters(PreparedStatement preparedStatement, Venda entity) throws SQLException {
+        preparedStatement.setLong(1, entity.getIdCliente());
+        preparedStatement.setLong(2, entity.getIdProduto());
+        preparedStatement.setInt(3, entity.getQuantidade());
+        preparedStatement.setDouble(4, entity.getValorTotal());
     }
 
     @Override
-    public void deletarVenda(Connection connection, Long id) throws SQLException {
-        String sql = "DELETE FROM venda WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-            stmt.executeUpdate();
-        }
+    protected void setUpdateParameters(PreparedStatement preparedStatement, Venda entity) throws SQLException {
+        preparedStatement.setLong(1, entity.getIdCliente());
+        preparedStatement.setLong(2, entity.getIdProduto());
+        preparedStatement.setInt(3, entity.getQuantidade());
+        preparedStatement.setDouble(4, entity.getValorTotal());
+        preparedStatement.setLong(5, entity.getId());
     }
 }

@@ -36,7 +36,7 @@ public class ProdutoDAOTest {
     public void testCadastrarProduto() throws SQLException {
         Produto produto = new Produto("Produto Teste", "Descrição do Produto", 29.99);
 
-        produtoDAO.cadastrarProduto(connection, produto);
+        produtoDAO.cadastrar(connection, produto);
 
         System.out.println("Produto cadastrado com sucesso!");
     }
@@ -44,22 +44,22 @@ public class ProdutoDAOTest {
     @Test
     public void testAtualizarProduto() throws SQLException {
         Produto produto = new Produto("Produto atualizado", "Descrição atualizada", 10.00);
-        produto.setId(1L);
+        produto.setId(2L);
 
-        produtoDAO.atualizarProduto(connection, produto);
+        produtoDAO.atualizar(connection, produto);
         System.out.println("Produto atualizado com sucesso!");
     }
 
     @Test
     public void testDeletarProduto() throws SQLException {
-        produtoDAO.deletarProduto(connection, 1L);
+        produtoDAO.deletar(connection, 1L);
 
         System.out.println("Produto deletado!");
     }
 
     @Test
     public void testBuscarProdutoPorId() throws SQLException {
-        Produto produto = produtoDAO.buscarProduto(connection, 2L);
+        Produto produto = produtoDAO.buscarPorId(connection, 2L);
 
         assertNotNull(produto, "Produto não encontrado!");
 
@@ -72,8 +72,8 @@ public class ProdutoDAOTest {
     }
 
     @Test
-    public void testBuscarTodosClientes() throws SQLException {
-        List<Produto> produtos = produtoDAO.buscarTodosProdutos(connection);
+    public void testBuscarTodosProdutos() throws SQLException {
+        List<Produto> produtos = produtoDAO.buscarTodos(connection);
 
         assertNotNull(produtos, "A lista de produtos não deve ser nula.");
         assertFalse(produtos.isEmpty(), "A lista de produtos não deve estar vazia.");

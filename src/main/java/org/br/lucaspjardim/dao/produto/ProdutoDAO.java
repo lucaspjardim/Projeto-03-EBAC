@@ -1,97 +1,65 @@
 package org.br.lucaspjardim.dao.produto;
 
-import org.br.lucaspjardim.model.cliente.Cliente;
+import org.br.lucaspjardim.dao.generic.GenericDAO;
 import org.br.lucaspjardim.model.produto.Produto;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Author: Lucas Jardim
  */
-public class ProdutoDAO implements IProdutoDAO {
+public class ProdutoDAO extends GenericDAO<Produto> {
 
     @Override
-    public void cadastrarProduto(Connection connection, Produto produto) throws SQLException {
-        String sql = "INSERT INTO produto (nome, descricao, preco) VALUES (?, ?, ?)";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, produto.getNome());
-            stmt.setString(2, produto.getDescricao());
-            stmt.setDouble(3, produto.getPreco());
-
-            stmt.executeUpdate();
-        }
+    protected String getInsertQuery() {
+        return "INSERT INTO produto (nome, descricao, preco) VALUES (?, ?, ?)";
     }
 
     @Override
-    public void atualizarProduto(Connection connection, Produto produto) throws SQLException {
-        String sql = "UPDATE produto SET nome = ?, descricao = ?, preco = ? WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, produto.getNome());
-            stmt.setString(2, produto.getDescricao());
-            stmt.setDouble(3, produto.getPreco());
-            stmt.setLong(4, produto.getId());
-
-            stmt.executeUpdate();
-        }
+    protected String getUpdateQuery() {
+        return "UPDATE produto SET nome = ?, descricao = ?, preco = ? WHERE id = ?";
     }
 
     @Override
-    public void deletarProduto(Connection connection, Long id) throws SQLException {
-        String sql = "DELETE FROM produto WHERE id = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
-
-            stmt.executeUpdate();
-        }
+    protected String getDeleteQuery() {
+        return "DELETE FROM produto WHERE id = ?";
     }
 
     @Override
-    public Produto buscarProduto(Connection connection, Long id) throws SQLException {
-        String sql = "SELECT * FROM produto WHERE id = ?";
-        Produto produto = null;
+    protected String getSelectQuery() {
+        return "SELECT * FROM produto WHERE id = ?";
+    }
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, id);
+    @Override
+    protected String getSelectAllQuery() {
+        return "SELECT * FROM produto";
+    }
 
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    produto = new Produto(
-                            rs.getString("nome"),
-                            rs.getString("descricao"),
-                            rs.getDouble("preco")
-                    );
-                    produto.setId(rs.getLong("id"));
-                }
-            }
-        }
+    @Override
+    protected Produto mapRow(ResultSet resultSet) throws SQLException {
+        Produto produto = new Produto(
+                resultSet.getString("nome"),
+                resultSet.getString("descricao"),
+                resultSet.getDouble("preco")
+        );
+        produto.setId(resultSet.getLong("id"));
         return produto;
     }
 
     @Override
-    public List<Produto> buscarTodosProdutos(Connection connection) throws SQLException {
-        String sql = "SELECT * FROM produto";
-        List<Produto> produtos = new ArrayList<>();
+    protected void setInsertParameters(PreparedStatement preparedStatement, Produto entity) throws SQLException {
+        preparedStatement.setString(1, entity.getNome());
+        preparedStatement.setString(2, entity.getDescricao());
+        preparedStatement.setDouble(3, entity.getPreco());
+    }
 
-        try(PreparedStatement stmt = connection.prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                Produto produto = new Produto(
-                        rs.getString("nome"),
-                        rs.getString("descricao"),
-                        rs.getDouble("preco")
-                );
-                produto.setId(rs.getLong("id"));
-                produtos.add(produto);
-            }
-        }
-        return produtos;
+    @Override
+    protected void setUpdateParameters(PreparedStatement preparedStatement, Produto entity) throws SQLException {
+        preparedStatement.setString(1, entity.getNome());
+        preparedStatement.setString(2, entity.getDescricao());
+        preparedStatement.setDouble(3, entity.getPreco());
+        preparedStatement.setLong(4, entity.getId());
     }
 }

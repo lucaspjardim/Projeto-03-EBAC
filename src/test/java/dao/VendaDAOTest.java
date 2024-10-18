@@ -33,9 +33,9 @@ public class VendaDAOTest {
 
     @Test
     public void testCadastrarVenda() throws SQLException {
-        Venda venda = new Venda(1L, 1L, 10, 5.0, new Date());
+        Venda venda = new Venda(3L, 2L, 10, 5.0, new Date());
 
-        vendaDAO.cadastrarVenda(connection, venda);
+        vendaDAO.cadastrar(connection, venda);
 
         System.out.println("Venda cadastrada com sucesso!");
     }
@@ -45,21 +45,21 @@ public class VendaDAOTest {
         Venda venda = new Venda(1L, 1L, 100, 5.0, new Date());
         venda.setId(1L);
 
-        vendaDAO.atualizarVenda(connection, venda);
+        vendaDAO.atualizar(connection, venda);
 
         System.out.println("Venda atualizada com sucesso!");
     }
 
     @Test
     public void testDeletarVenda() throws SQLException {
-        vendaDAO.deletarVenda(connection, 1L);
+        vendaDAO.deletar(connection, 1L);
 
         System.out.println("Venda deletada com sucesso!");
     }
 
     @Test
     public void testBuscarVendaPorId() throws SQLException {
-        Venda venda = vendaDAO.buscarVenda(connection, 2L);
+        Venda venda = vendaDAO.buscarPorId(connection, 2L);
 
         assertNotNull(venda, "Venda não encontrada!");
         assertEquals(2L, venda.getId(), "ID da venda não corresponde.");
@@ -75,7 +75,7 @@ public class VendaDAOTest {
 
     @Test
     public void testBuscarTodasVendas() throws SQLException {
-        List<Venda> vendas = vendaDAO.buscarTodasVendas(connection);
+        List<Venda> vendas = vendaDAO.buscarTodos(connection);
 
         assertNotNull(vendas, "A lista de vendas não deve ser nula.");
         assertFalse(vendas.isEmpty(), "A lista de vendas não deve estar vazia.");
