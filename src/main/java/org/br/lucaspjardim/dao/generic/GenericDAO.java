@@ -23,7 +23,7 @@ public abstract class GenericDAO<T> implements IGenericDAO<T> {
 
     @Override
     public void cadastrar(Connection connection, T entity) throws SQLException {
-        try(PreparedStatement preparedStatement = connection.prepareStatement(getInsertQuery())) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(getInsertQuery())) {
             setInsertParameters(preparedStatement, entity);
             preparedStatement.executeUpdate();
         }

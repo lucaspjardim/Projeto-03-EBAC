@@ -11,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Author: Lucas Jardim
  */
-public class VendaDAO extends GenericDAO<Venda> {
+public class VendaDAO extends GenericDAO<Venda> implements IVendaDAO {
 
     @Override
     protected String getInsertQuery() {
@@ -72,13 +72,14 @@ public class VendaDAO extends GenericDAO<Venda> {
         preparedStatement.setLong(5, entity.getId());
     }
 
+    @Override
     public void cadastrarVenda(Connection connection, Venda venda) throws SQLException {
         super.cadastrar(connection, venda);
-
         atualizarEstoque(connection, venda.getIdProduto(), venda.getQuantidade());
     }
 
-    private void atualizarEstoque(Connection connection, Long produtoId, int quantidadeVendida) throws SQLException {
+    @Override
+    public void atualizarEstoque(Connection connection, Long produtoId, int quantidadeVendida) throws SQLException {
         String sql = "UPDATE produto SET estoque = estoque - ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, quantidadeVendida);

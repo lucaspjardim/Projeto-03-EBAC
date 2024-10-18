@@ -9,5 +9,7 @@ import java.util.List;
  * Author: Lucas Jardim
  */
 public interface IVendaDAO {
+    void cadastrarVenda(Connection connection, Venda venda) throws SQLException;
+    void atualizarEstoque(Connection connection, Long produtoId, int quantidadeVendida) throws SQLException;
 
 }

@@ -11,4 +11,5 @@ import java.util.List;
  * Author: Lucas Jardim
  */
 public interface IProdutoDAO {
+    int getEstoque(Connection connection, Long idProduto) throws SQLException;
 }

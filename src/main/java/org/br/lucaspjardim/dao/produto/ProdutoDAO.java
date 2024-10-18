@@ -11,7 +11,7 @@ import java.sql.SQLException;
 /**
  * Author: Lucas Jardim
  */
-public class ProdutoDAO extends GenericDAO<Produto> {
+public class ProdutoDAO extends GenericDAO<Produto> implements IProdutoDAO  {
 
     @Override
     protected String getInsertQuery() {
@@ -68,6 +68,7 @@ public class ProdutoDAO extends GenericDAO<Produto> {
         preparedStatement.setLong(4, entity.getId());
     }
 
+    @Override
     public int getEstoque(Connection connection, Long idProduto) throws SQLException {
         String query = "SELECT estoque FROM produto WHERE id = ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
