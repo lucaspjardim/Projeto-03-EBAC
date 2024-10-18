@@ -1,5 +1,6 @@
 package dao;
 
+import org.br.lucaspjardim.dao.produto.ProdutoDAO; // Certifique-se de ter acesso ao ProdutoDAO
 import org.br.lucaspjardim.dao.venda.VendaDAO;
 import org.br.lucaspjardim.jdbc.ConnectionFactory;
 import org.br.lucaspjardim.model.venda.Venda;
@@ -16,12 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class VendaDAOTest {
     private VendaDAO vendaDAO;
+    private ProdutoDAO produtoDAO; // Adicionando ProdutoDAO para verificar o estoque
     private Connection connection;
 
     @BeforeEach
     public void setUp() throws SQLException {
         connection = ConnectionFactory.getConnection();
         vendaDAO = new VendaDAO();
+        produtoDAO = new ProdutoDAO(); // Inicializando ProdutoDAO
     }
 
     @AfterEach
@@ -33,17 +36,27 @@ public class VendaDAOTest {
 
     @Test
     public void testCadastrarVenda() throws SQLException {
-        Venda venda = new Venda(3L, 2L, 10, 5.0, new Date());
+        // Assume que o produto com ID 2 tem um estoque suficiente para a venda
+        Long idProduto = 5L;
+        int quantidadeVenda = 10;
 
-        vendaDAO.cadastrar(connection, venda);
+        int estoqueAntes = produtoDAO.getEstoque(connection, idProduto);
+
+        Venda venda = new Venda(3L, idProduto, quantidadeVenda, 5.0, new Date(), "Lucas", "Agua");
+        vendaDAO.cadastrarVenda(connection, venda);
+
+        int estoqueDepois = produtoDAO.getEstoque(connection, idProduto);
+
+        assertEquals(estoqueAntes - quantidadeVenda, estoqueDepois, "O estoque não foi atualizado corretamente após a venda.");
 
         System.out.println("Venda cadastrada com sucesso!");
+        System.out.println("Quantidade no estoque agora: "+ estoqueDepois);
     }
 
     @Test
     public void testAtualizarVenda() throws SQLException {
-        Venda venda = new Venda(1L, 1L, 100, 5.0, new Date());
-        venda.setId(1L);
+        Venda venda = new Venda(3L, 4L, 100, 5.0, new Date(), "eu", "Aguaa");
+        venda.setId(2L);
 
         vendaDAO.atualizar(connection, venda);
 
@@ -67,7 +80,9 @@ public class VendaDAOTest {
         System.out.println("Venda buscada: ");
         System.out.println("ID: " + venda.getId());
         System.out.println("ID Cliente: " + venda.getIdCliente());
+        System.out.println("Nome do cliente: " + venda.getNomeCliente());
         System.out.println("ID Produto: " + venda.getIdProduto());
+        System.out.println("Nome do produto: " + venda.getNomeProduto());
         System.out.println("Quantidade: " + venda.getQuantidade());
         System.out.println("Valor Total: " + venda.getValorTotal());
         System.out.println("Data da Venda: " + venda.getDataVenda());
@@ -83,12 +98,13 @@ public class VendaDAOTest {
         for (Venda venda : vendas) {
             System.out.println("ID: " + venda.getId());
             System.out.println("ID Cliente: " + venda.getIdCliente());
+            System.out.println("Nome do cliente: " + venda.getNomeCliente());
             System.out.println("ID Produto: " + venda.getIdProduto());
+            System.out.println("Nome do produto: " + venda.getNomeProduto());
             System.out.println("Quantidade: " + venda.getQuantidade());
             System.out.println("Valor Total: " + venda.getValorTotal());
             System.out.println("Data da Venda: " + venda.getDataVenda());
             System.out.println("-----------------------------");
         }
     }
-
 }

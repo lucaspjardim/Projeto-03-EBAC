@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,7 +37,8 @@ public class ClienteDAOTest {
 
     @Test
     public void testCadastrarCliente() throws SQLException {
-        Cliente cliente = new Cliente("Lucas Jardim", "lucas4@exemplo.com", "99999-9999");
+        Date dataNascimento = new Date();
+        Cliente cliente = new Cliente("Lucas Jardim", "lucas4@exemplo.com", "99999-9999", "Rua X", dataNascimento);
 
         clienteDAO.cadastrar(connection, cliente);
 
@@ -46,8 +48,9 @@ public class ClienteDAOTest {
 
     @Test
     public void testAtualizarCliente() throws SQLException {
-        Cliente cliente = new Cliente("Lucas Pasquali", "lucas5@gmail.com", "00000-0000");
-        cliente.setId(2L);
+        Date dataNascimento = new Date();
+        Cliente cliente = new Cliente("Lucas Pasquali", "lucas5@gmail.com", "00000-0000", "Rua Y", dataNascimento);
+        cliente.setId(9L);
 
         clienteDAO.atualizar(connection, cliente);
         System.out.println("Cliente atualizado com sucesso no teste.");
@@ -71,6 +74,8 @@ public class ClienteDAOTest {
         System.out.println("Nome: " + cliente.getNome());
         System.out.println("Email: " + cliente.getEmail());
         System.out.println("Telefone: " + cliente.getTelefone());
+        System.out.println("Endereço: " + cliente.getEndereco());
+        System.out.println("Data de Nascimento: " + cliente.getDataNascimento());
     }
 
     @Test
@@ -85,6 +90,8 @@ public class ClienteDAOTest {
             System.out.println("Nome: " + cliente.getNome());
             System.out.println("Email: " + cliente.getEmail());
             System.out.println("Telefone: " + cliente.getTelefone());
+            System.out.println("Endereço: " + cliente.getEndereco());
+            System.out.println("Data de Nascimento: " + cliente.getDataNascimento());
             System.out.println("-----------------------------");
         }
     }

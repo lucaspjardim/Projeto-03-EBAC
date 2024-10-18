@@ -1,5 +1,7 @@
 package org.br.lucaspjardim.model.cliente;
 
+import java.util.Date;
+
 /**
  * Author: Lucas Jardim
  */
@@ -8,11 +10,15 @@ public class Cliente {
     private String nome;
     private String email;
     private String telefone;
+    private String endereco;
+    private Date dataNascimento;
 
-    public Cliente(String nome, String email, String telefone) {
+    public Cliente(String nome, String email, String telefone, String endereco, Date dataNascimento) {
         this.nome = nome;
         this.email = email;
         this.telefone = telefone;
+        this.endereco = endereco;
+        this.dataNascimento = dataNascimento;
     }
 
     public Long getId() {
@@ -46,4 +52,12 @@ public class Cliente {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
+
+    public String getEndereco() { return endereco; }
+
+    public void setEndereco(String endereco) { this.endereco = endereco; }
+
+    public Date getDataNascimento() { return dataNascimento; }
+
+    public void setDataNascimento(Date dataNascimento) { this.dataNascimento = dataNascimento; }
 }

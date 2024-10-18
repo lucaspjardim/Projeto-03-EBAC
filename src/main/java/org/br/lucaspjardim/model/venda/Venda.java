@@ -9,13 +9,17 @@ public class Venda {
     private int quantidade;
     private Double valorTotal;
     private Date dataVenda;
+    private String nomeCliente;
+    private String nomeProduto;
 
-    public Venda(Long idCliente, Long idProduto, int quantidade, Double valorTotal, Date dataVenda) {
+    public Venda(Long idCliente, Long idProduto, int quantidade, Double valorTotal, Date dataVenda, String nomeCliente, String nomeProduto) {
         this.idCliente = idCliente;
         this.idProduto = idProduto;
         this.quantidade = quantidade;
         this.valorTotal = valorTotal;
         this.dataVenda = dataVenda;
+        this.nomeCliente = nomeCliente;
+        this.nomeProduto = nomeProduto;
     }
 
     public Long getId() {
@@ -64,6 +68,22 @@ public class Venda {
 
     public void setDataVenda(Date dataVenda) {
         this.dataVenda = dataVenda;
+    }
+
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    public void setNomeCliente(String nomeCliente) {
+        this.nomeCliente = nomeCliente;
+    }
+
+    public String getNomeProduto() {
+        return nomeProduto;
+    }
+
+    public void setNomeProduto(String nomeProduto) {
+        this.nomeProduto = nomeProduto;
     }
 
 }

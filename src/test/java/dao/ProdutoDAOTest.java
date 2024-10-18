@@ -34,7 +34,7 @@ public class ProdutoDAOTest {
 
     @Test
     public void testCadastrarProduto() throws SQLException {
-        Produto produto = new Produto("Produto Teste", "Descrição do Produto", 29.99);
+        Produto produto = new Produto("Produto Teste", "Descrição do Produto", 29.99, "X", 100);
 
         produtoDAO.cadastrar(connection, produto);
 
@@ -43,7 +43,7 @@ public class ProdutoDAOTest {
 
     @Test
     public void testAtualizarProduto() throws SQLException {
-        Produto produto = new Produto("Produto atualizado", "Descrição atualizada", 10.00);
+        Produto produto = new Produto("Produto atualizado", "Descrição atualizada", 10.00,"Y", 10);
         produto.setId(2L);
 
         produtoDAO.atualizar(connection, produto);
@@ -69,6 +69,8 @@ public class ProdutoDAOTest {
         System.out.println("Nome: " + produto.getNome());
         System.out.println("Descrição: " + produto.getDescricao());
         System.out.println("Preço: " + produto.getPreco());
+        System.out.println("Categoria: "+ produto.getCategoria());
+        System.out.println("Estoque: " + produto.getEstoque());
     }
 
     @Test
@@ -83,6 +85,8 @@ public class ProdutoDAOTest {
             System.out.println("Nome: " + produto.getNome());
             System.out.println("Email: " + produto.getDescricao());
             System.out.println("Telefone: " + produto.getPreco());
+            System.out.println("Categoria: "+ produto.getCategoria());
+            System.out.println("Estoque: " + produto.getEstoque());
             System.out.println("-----------------------------");
         }
     }

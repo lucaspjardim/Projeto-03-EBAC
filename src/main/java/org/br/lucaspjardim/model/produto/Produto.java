@@ -8,11 +8,15 @@ public class Produto {
     private String nome;
     private String descricao;
     private Double preco;
+    private String categoria;
+    private Integer estoque;
 
-    public Produto(String nome, String descricao, Double preco) {
+    public Produto(String nome, String descricao, Double preco, String categoria, Integer estoque) {
         this.nome = nome;
         this.descricao = descricao;
         this.preco = preco;
+        this.categoria = categoria;
+        this.estoque = estoque;
     }
 
     public Long getId() {
@@ -45,5 +49,29 @@ public class Produto {
 
     public void setPreco(Double preco) {
         this.preco = preco;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public Integer getEstoque() {
+        return estoque;
+    }
+
+    public void setEstoque(Integer estoque) {
+        this.estoque = estoque;
+    }
+
+    public void reduzirEstoque(int quantidade) {
+        if (quantidade <= estoque) {
+            estoque -= quantidade;
+        } else {
+            throw new IllegalArgumentException("Quantidade excede o estoque disponível.");
+        }
     }
 }
