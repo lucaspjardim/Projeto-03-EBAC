@@ -1,25 +1,45 @@
 package org.br.lucaspjardim.model.venda;
 
+import jakarta.persistence.*;
+import org.br.lucaspjardim.model.cliente.Cliente;
+import org.br.lucaspjardim.model.produto.Produto;
+
 import java.util.Date;
 
+@Entity
+@Table(name = "vendas")
 public class Venda {
-    private Long id;
-    private Long idCliente; // Referência ao ID do Cliente
-    private Long idProduto; // Referência ao ID do Produto
-    private int quantidade;
-    private Double valorTotal;
-    private Date dataVenda;
-    private String nomeCliente;
-    private String nomeProduto;
 
-    public Venda(Long idCliente, Long idProduto, int quantidade, Double valorTotal, Date dataVenda, String nomeCliente, String nomeProduto) {
-        this.idCliente = idCliente;
-        this.idProduto = idProduto;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente; // Referência ao objeto Cliente
+
+    @ManyToOne
+    @JoinColumn(name = "produto_id", nullable = false)
+    private Produto produto; // Referência ao objeto Produto
+
+    private int quantidade;
+
+    @Column(name = "valor_total")
+    private Double valorTotal;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "data_venda")
+    private Date dataVenda;
+
+    public Venda() {
+    }
+
+    public Venda(Cliente cliente, Produto produto, int quantidade, Double valorTotal, Date dataVenda) {
+        this.cliente = cliente;
+        this.produto = produto;
         this.quantidade = quantidade;
         this.valorTotal = valorTotal;
         this.dataVenda = dataVenda;
-        this.nomeCliente = nomeCliente;
-        this.nomeProduto = nomeProduto;
     }
 
     public Long getId() {
@@ -30,20 +50,20 @@ public class Venda {
         this.id = id;
     }
 
-    public Long getIdCliente() {
-        return idCliente;
+    public Cliente getCliente() {
+        return cliente;
     }
 
-    public void setIdCliente(Long idCliente) {
-        this.idCliente = idCliente;
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 
-    public Long getIdProduto() {
-        return idProduto;
+    public Produto getProduto() {
+        return produto;
     }
 
-    public void setIdProduto(Long idProduto) {
-        this.idProduto = idProduto;
+    public void setProduto(Produto produto) {
+        this.produto = produto;
     }
 
     public int getQuantidade() {
@@ -69,21 +89,4 @@ public class Venda {
     public void setDataVenda(Date dataVenda) {
         this.dataVenda = dataVenda;
     }
-
-    public String getNomeCliente() {
-        return nomeCliente;
-    }
-
-    public void setNomeCliente(String nomeCliente) {
-        this.nomeCliente = nomeCliente;
-    }
-
-    public String getNomeProduto() {
-        return nomeProduto;
-    }
-
-    public void setNomeProduto(String nomeProduto) {
-        this.nomeProduto = nomeProduto;
-    }
-
 }

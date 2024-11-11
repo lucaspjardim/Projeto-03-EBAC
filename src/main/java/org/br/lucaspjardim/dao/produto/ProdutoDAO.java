@@ -1,84 +1,49 @@
 package org.br.lucaspjardim.dao.produto;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.NoResultException;
 import org.br.lucaspjardim.dao.generic.GenericDAO;
 import org.br.lucaspjardim.model.produto.Produto;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Author: Lucas Jardim
  */
-public class ProdutoDAO extends GenericDAO<Produto> implements IProdutoDAO  {
+public class ProdutoDAO extends GenericDAO<Produto> implements IProdutoDAO {
 
-    @Override
-    protected String getInsertQuery() {
-        return "INSERT INTO produto (nome, descricao, preco, categoria, estoque) VALUES (?, ?, ?, ?, ?)";
+    private final EntityManager entityManager;
+
+    public ProdutoDAO(EntityManager entityManager) {
+        super(entityManager, Produto.class); // Passando EntityManager e Produto.class para o construtor do GenericDAO
+        this.entityManager = entityManager;
     }
 
-    @Override
-    protected String getUpdateQuery() {
-        return "UPDATE produto SET nome = ?, descricao = ?, preco = ? WHERE id = ?";
-    }
-
-    @Override
-    protected String getDeleteQuery() {
-        return "DELETE FROM produto WHERE id = ?";
-    }
-
-    @Override
-    protected String getSelectQuery() {
-        return "SELECT * FROM produto WHERE id = ?";
-    }
-
-    @Override
-    protected String getSelectAllQuery() {
-        return "SELECT * FROM produto";
-    }
-
-    @Override
-    protected Produto mapRow(ResultSet resultSet) throws SQLException {
-        Produto produto = new Produto(
-                resultSet.getString("nome"),
-                resultSet.getString("descricao"),
-                resultSet.getDouble("preco"),
-                resultSet.getString("categoria"),
-                resultSet.getInt("estoque")
-        );
-        produto.setId(resultSet.getLong("id"));
-        return produto;
-    }
-
-    @Override
-    protected void setInsertParameters(PreparedStatement preparedStatement, Produto entity) throws SQLException {
-        preparedStatement.setString(1, entity.getNome());
-        preparedStatement.setString(2, entity.getDescricao());
-        preparedStatement.setDouble(3, entity.getPreco());
-        preparedStatement.setString(4, entity.getCategoria());
-        preparedStatement.setInt(5, entity.getEstoque());
-    }
-
-    @Override
-    protected void setUpdateParameters(PreparedStatement preparedStatement, Produto entity) throws SQLException {
-        preparedStatement.setString(1, entity.getNome());
-        preparedStatement.setString(2, entity.getDescricao());
-        preparedStatement.setDouble(3, entity.getPreco());
-        preparedStatement.setLong(4, entity.getId());
-    }
-
-    @Override
-    public int getEstoque(Connection connection, Long idProduto) throws SQLException {
-        String query = "SELECT estoque FROM produto WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-            preparedStatement.setLong(1, idProduto);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("estoque");
-            } else {
-                throw new SQLException("Produto não encontrado com ID: " + idProduto);
-            }
+    /**
+     * Obtém o estoque de um produto pelo ID.
+     * @param idProduto o ID do produto.
+     * @return a quantidade em estoque do produto.
+     */
+    public int getEstoque(Long idProduto) {
+        try {
+            return entityManager.createQuery("SELECT p.estoque FROM Produto p WHERE p.id = :id", Integer.class)
+                    .setParameter("id", idProduto)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new IllegalArgumentException("Produto não encontrado com ID: " + idProduto);
         }
     }
+
+    /**
+     * Atualiza o estoque de um produto.
+     * @param idProduto o ID do produto.
+     * @param quantidade nova quantidade de estoque.
+     */
+    public void atualizarEstoque(Long idProduto, int quantidade) {
+        Produto produto = entityManager.find(Produto.class, idProduto);
+        if (produto != null) {
+            produto.setEstoque(quantidade);
+            entityManager.merge(produto);
+        }
+    }
+
 }

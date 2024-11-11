@@ -1,72 +1,76 @@
 package org.br.lucaspjardim.dao.generic;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+
 import java.util.List;
 
 /**
  * Author: Lucas Jardim
  */
 public abstract class GenericDAO<T> implements IGenericDAO<T> {
-    protected abstract String getInsertQuery();
-    protected abstract String getUpdateQuery();
-    protected abstract String getDeleteQuery();
-    protected abstract String getSelectQuery();
-    protected abstract String getSelectAllQuery();
-    protected abstract T mapRow(ResultSet resultSet) throws SQLException;
 
-    protected abstract void setInsertParameters(PreparedStatement preparedStatement, T entity) throws SQLException;
-    protected abstract void setUpdateParameters(PreparedStatement preparedStatement, T entity) throws SQLException;
+    private final EntityManager entityManager;
+    private final Class<T> entityClass;
 
-    @Override
-    public void cadastrar(Connection connection, T entity) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(getInsertQuery())) {
-            setInsertParameters(preparedStatement, entity);
-            preparedStatement.executeUpdate();
-        }
+    protected GenericDAO(EntityManager entityManager, Class<T> entityClass) {
+        this.entityManager = entityManager;
+        this.entityClass = entityClass;
     }
 
-    @Override
-    public void atualizar(Connection connection, T entity) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(getUpdateQuery())) {
-            setUpdateParameters(preparedStatement, entity);
-            preparedStatement.executeUpdate();
+    public void cadastrar(T entity) {
+        EntityTransaction tx = entityManager.getTransaction();
+        if (!tx.isActive()) {
+            tx.begin();
         }
-    }
-
-    @Override
-    public void deletar(Connection connection, Long id) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(getDeleteQuery())) {
-            preparedStatement.setLong(1, id);
-            preparedStatement.executeUpdate();
-        }
-    }
-
-    @Override
-    public T buscarPorId(Connection connection, Long id) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(getSelectQuery())) {
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return mapRow(resultSet);
+        try {
+            entityManager.persist(entity);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) {
+                tx.rollback();
             }
-            return null;
+            throw e;
         }
-
     }
 
     @Override
-    public List<T> buscarTodos(Connection connection) throws SQLException {
-        List<T> entities = new ArrayList<>();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(getSelectAllQuery())) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                entities.add(mapRow(resultSet));
+    public void atualizar(T entity) {
+        EntityTransaction tx = entityManager.getTransaction();
+        try {
+            // Verifique se a transação não está ativa antes de iniciar uma nova
+            if (!tx.isActive()) {
+                tx.begin();
             }
+            entityManager.merge(entity);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
         }
-        return entities;
+    }
+
+
+    @Override
+    public void deletar(Long id) {
+        T entity = entityManager.find(entityClass, id);
+        if (entity != null) {
+            entityManager.remove(entity);
+        }
+    }
+
+    @Override
+    public T buscarPorId(Long id) {
+        return entityManager.find(entityClass, id);
+    }
+
+    @Override
+    public List<T> buscarTodos() {
+        return entityManager.createQuery("SELECT e FROM " + entityClass.getSimpleName() + " e", entityClass)
+                .getResultList();
+    }
+
+    protected EntityManager getEntityManager() {
+        return this.entityManager;
     }
 }

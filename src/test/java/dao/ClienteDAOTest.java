@@ -1,14 +1,16 @@
 package dao;
 
 import org.br.lucaspjardim.dao.cliente.ClienteDAO;
-import org.br.lucaspjardim.jdbc.ConnectionFactory;
 import org.br.lucaspjardim.model.cliente.Cliente;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
+
 import java.util.Date;
 import java.util.List;
 
@@ -17,57 +19,75 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Author: Lucas Jardim
  */
-
 public class ClienteDAOTest {
     private ClienteDAO clienteDAO;
-    private Connection connection;
+    private EntityManagerFactory entityManagerFactory;
+    private EntityManager entityManager;
 
     @BeforeEach
-    public void setUp() throws SQLException {
-        connection = ConnectionFactory.getConnection();
-        clienteDAO = new ClienteDAO();
+    public void setUp() {
+        entityManagerFactory = Persistence.createEntityManagerFactory("vendasPU");
+        entityManager = entityManagerFactory.createEntityManager();
+        clienteDAO = new ClienteDAO(entityManager);
     }
 
     @AfterEach
-    public void tearDown() throws SQLException {
-        if (connection != null && !connection.isClosed()) {
-            connection.close();
+    public void tearDown() {
+        if (entityManager != null) {
+            entityManager.close();
+        }
+        if (entityManagerFactory != null) {
+            entityManagerFactory.close();
         }
     }
 
     @Test
-    public void testCadastrarCliente() throws SQLException {
+    public void testCadastrarCliente() {
         Date dataNascimento = new Date();
-        Cliente cliente = new Cliente("Lucas Jardim", "lucas4@exemplo.com", "99999-9999", "Rua X", dataNascimento);
+        Cliente cliente = new Cliente("Lucas Jardim", "lucas4@exaemplo.com", "99999-9999", "Rua X", dataNascimento);
 
-        clienteDAO.cadastrar(connection, cliente);
+        if (!entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().begin();
+        }
+        clienteDAO.cadastrar(cliente);
+        entityManager.getTransaction().commit();
 
         assertNotNull(cliente.getEmail(), "O email do cliente não deve ser nulo.");
         System.out.println("Cliente cadastrado com sucesso no teste.");
     }
 
-    @Test
-    public void testAtualizarCliente() throws SQLException {
-        Date dataNascimento = new Date();
-        Cliente cliente = new Cliente("Lucas Pasquali", "lucas5@gmail.com", "00000-0000", "Rua Y", dataNascimento);
-        cliente.setId(9L);
 
-        clienteDAO.atualizar(connection, cliente);
+    @Test
+    public void testAtualizarCliente() {
+        Date dataNascimento = new Date();
+        Cliente cliente = new Cliente("Lucas Pasquali", "lucas5@gmaail.com", "00000-0000", "Rua Y", dataNascimento);
+        cliente.setId(1L);
+
+        entityManager.getTransaction().begin();
+        clienteDAO.atualizar(cliente);
+        entityManager.getTransaction().commit();
+
         System.out.println("Cliente atualizado com sucesso no teste.");
     }
 
     @Test
-    public void testDeletarCliente() throws SQLException {
-        clienteDAO.deletar(connection, 2L);
+    public void testDeletarCliente() {
+
+        clienteDAO.deletar(6L);
+
+        Cliente cliente = clienteDAO.buscarPorId(6L);
+        Assertions.assertNull(cliente, "O cliente deveria ter sido deletado.");
+
         System.out.println("Cliente deletado com sucesso no teste.");
     }
 
-    @Test
-    public void testBuscarClientePorId() throws SQLException {
-        Cliente cliente = clienteDAO.buscarPorId(connection, 3L);
 
-        assertNotNull(cliente, "O cliente não encontrado!");
-        assertEquals(3L, cliente.getId(), "O ID do cliente deve corresponder ao que foi buscado.");
+    @Test
+    public void testBuscarClientePorId() {
+        Cliente cliente = clienteDAO.buscarPorId(5L);
+
+        assertNotNull(cliente, "O cliente não foi encontrado!");
+        assertEquals(5L, cliente.getId(), "O ID do cliente deve corresponder ao que foi buscado.");
 
         System.out.println("Cliente buscado: ");
         System.out.println("ID: " + cliente.getId());
@@ -79,8 +99,8 @@ public class ClienteDAOTest {
     }
 
     @Test
-    public void testBuscarTodosClientes() throws SQLException {
-        List<Cliente> clientes = clienteDAO.buscarTodos(connection);
+    public void testBuscarTodosClientes() {
+        List<Cliente> clientes = clienteDAO.buscarTodos();
 
         assertNotNull(clientes, "A lista de clientes não deve ser nula.");
         assertFalse(clientes.isEmpty(), "A lista de clientes não deve estar vazia.");

@@ -1,15 +1,35 @@
 package org.br.lucaspjardim.model.produto;
 
+import jakarta.persistence.*;
+
 /**
  * Author: Lucas Jardim
  */
+@Entity
+@Table(name = "produtos")
 public class Produto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "nome", nullable = false)
     private String nome;
+
+    @Column(name = "descricao")
     private String descricao;
+
+    @Column(name = "preco", nullable = false)
     private Double preco;
+
+    @Column(name = "categoria")
     private String categoria;
+
+    @Column(name = "estoque")
     private Integer estoque;
+
+    public Produto() {
+    }
 
     public Produto(String nome, String descricao, Double preco, String categoria, Integer estoque) {
         this.nome = nome;
